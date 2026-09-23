@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.1.6
+
+- Rebuild Aeglet's battle art at native in-game dimensions instead of using the larger concept-sized front sprite.
+- Replace the front battle sprite with a cleaned 40x40 version with simpler pixel clusters and a clearer silhouette.
+- Replace the back battle sprite with a matching cleaned 32x32 version.
+- Replace the party/menu art with a purpose-built 16x32 two-frame icon.
+- Preserve alpha transparency across all three assets.
+- Set `frontSize` back to 5 for the 40x40 front sprite.
+- Update the deterministic asset generator and release validator for the native-size sprite set.
+
 ## 0.1.5
 
 - Replace the prototype Aeglet artwork with a substantially more polished Gen 2-inspired sprite set.
