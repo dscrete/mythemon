@@ -72,7 +72,7 @@ return function(mod)
     frontSize = 7,
     trueColor = true,
     cry = SPECIES,
-    icon = { image = icon, frames = 2, trueColor = true },
+    icon = { image = icon, frames = 2 },
     dexEntry = {
       kind = "FABLE",
       heightFt = 1,
