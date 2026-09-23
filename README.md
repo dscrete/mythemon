@@ -14,7 +14,7 @@ The first species is **Aeglet**, a small unevolved Psychic-type creature designe
 - No evolution yet
 - Normal encounter: rare slot in Viridian Forest at level 5
 
-Aeglet's current art keeps the established fox-like mythic design while aiming for a middle ground between the overly detailed concept pass and the overly primitive 0.1.6 reduction. The front and back sprites use controlled pixel clusters, a restrained tan/brown/cream/purple palette, and full alpha transparency. Aeglet's battle art and party icon are registered as true-color assets so Gen1Recomp preserves the authored colors instead of remapping them through the legacy four-shade battle palette pipeline.
+Aeglet's current art keeps the established fox-like mythic design while aiming for a middle ground between the overly detailed concept pass and the overly primitive 0.1.6 reduction. The front and back sprites use controlled pixel clusters, a restrained tan/brown/cream/purple palette, and full alpha transparency. Aeglet's battle art and party icon are registered through Gen1Recomp's supported true-color fields so the authored colors are preserved instead of remapped through the legacy four-shade battle palette pipeline.
 
 `tools/make_assets.py` restores the exact release-tested sprite bytes deterministically.
 
@@ -36,6 +36,10 @@ Extract the release ZIP so the top-level `mythmon` directory is inside Gen1Recom
 
 Mythmon uses Mod API 2 and currently declares Gen1Recomp compatibility from **0.3.3 through 0.5.0 inclusive**. Development builds are also allowed for local testing. Versions newer than 0.5.0 are intentionally not claimed yet; the range can be widened after they are checked.
 
-The current engine API still provides the custom Pokemon/icon registries, item-effects registry, `save.loaded`/`save.created` lifecycle events, `encounter.species` hook, and true-color sprite support used by Mythmon, so no gameplay-code migration was required for the 0.5.0 compatibility update.
+The current engine API provides the custom Pokemon/icon registries, item-effects registry, `save.loaded`/`save.created` lifecycle events, `encounter.species` hook, and true-color sprite support used by Mythmon. The embedded `pokemon.icon` record intentionally contains only `image` and `frames`; icon true-color state belongs on the separate icon registry entry under the current strict schema.
+
+### Recovery from v0.1.8/v0.1.9 load failures
+
+Those releases could fail registry validation because they put `trueColor` inside the strict embedded `pokemon.icon` record. When a mod fails to load, current Gen1Recomp quarantines unknown mod-owned Pokemon and items in the save rather than permanently discarding them. Once Mythmon loads successfully again, Gen1Recomp can reclaim that content. Recovered Pokemon are deposited into a PC box; recovered items return to the Bag when possible and otherwise to PC item storage.
 
 This release tests the core custom-species pipeline only. It does not yet add bespoke animated battle frames, shiny art, or Wilds of Kanto overworld/follower sprites. The species and asset IDs are namespaced to make those compatibility layers easier to add later.
