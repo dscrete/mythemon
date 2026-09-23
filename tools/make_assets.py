@@ -1,97 +1,61 @@
 #!/usr/bin/env python3
-"""Generate original four-shade static assets for Aeglet.
+"""Restore Mythmon's committed Aeglet sprite assets exactly.
 
-Dimensions follow Gen1Recomp's compact custom-species example:
-40x40 front (frontSize 5), 32x32 back, and a 16x32 two-frame icon.
-
-Assets are written as plain grayscale PNGs rather than indexed-palette PNGs.
-This keeps the files simple for LÖVE and makes CRC validation straightforward.
+The polished sprites are authored assets rather than procedural placeholder art.
+This script embeds the release-tested PNG bytes so running it cannot regress the
+artwork or transparency.
 """
+from base64 import b64decode
 from pathlib import Path
-from PIL import Image, ImageDraw
+import struct
+import zlib
 
 ROOT = Path(__file__).resolve().parent.parent / "assets"
-SHADES = [(248,248,248),(168,168,168),(88,88,88),(8,8,8)]
+
+ASSETS = {
+    "aeglet_front.png": (
+        (56, 56),
+        "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",
+    ),
+    "aeglet_back.png": (
+        (32, 32),
+        "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAACE0lEQVR4nM1XPUgCYRh+jAYRRwunxnCQhiMcHVoDaWhwcBaHRkGIcigRxEkQEufGBhEaXBpsc7ihSZyiSaw2ibZrkNd77+677+cy6QE5/d7vvvd5n/fHO+C/IhlPONvws6MiEYWIyT2hBJbfXzEAOEtehR4oWjclLFWAQCT8n3Z2FFDJbhWMiCgJDJaNNQk6XIRkPOHMOkXn5vZIx68+gTC0syPP9c9Akc06RaeUajqzTnGdgrvj5/V3svv3qM7XUsCqDQEA9esXAAikgn6T3QQxmZEiEOWeSInsZKNOkmFXh6UIsoLkSMYTjoxIZAK6zvmVwAlF7gIdLCZdVPKZUGKAogb8m3Vk57WxmHQD9v3cBQBXBSMFrNoQskHDbaLIOSgwpQJ8M7CaiIA7Ifm6f40UKJ/M0X9Kr9e5CpGLkIj4YbcK7tyodjG3zz0k6lVvWpQpoOgr+QzsVgGDZSMQKeBVhOTvjae4/7iUqqxdA+XTQwBuIXIig2UDdqugLFJ/9EDEOcAdWbWG1HEp1XQAIG09AFipwvHrOaDTmuScw7gNeX+rwKPkzmmdT0LjNuTwpiJIkM8CTooTMKqBsAPD7L3xFJV8JtS5MQE/+o8zAG6HiCCSfWME6HCRGuRU9XesXYSq2S6CyjmgoYDsuY4fHvVNSjsF9uun0Z7cwR4mb+/Ke5Qp0HmuM9kXGboSb+uldmP4Adv+CyjvgtJTAAAAAElFTkSuQmCC",
+    ),
+    "aeglet_icon.png": (
+        (16, 32),
+        "iVBORw0KGgoAAAANSUhEUgAAABAAAAAgCAYAAAAbifjMAAAAz0lEQVR4nGNgGPRgusnh//jkmWAMHg4uvAqRAbJaJnSJGJE2uCTMdmRXIMtjGICsCN1F6IZjGPDlxzdGZIkAnhoG59ipDAwMDAzOsVMZAnhqGBgYGBg2fGlBUcuCbmJd7SVsjmKoq73E0NSshyGOYisPB9f/c51+WA2AAaPyTSguwBoGMIX4+GS7AN0VGC5Atylj6nGcmjFcAHMFAwMDAzaXwAxHjzEMA5DxrYkRKHx09VhNwqYQr634ACl5hDZgNDuPZmdiXDGanYkANM/OAM92qWX2BpQVAAAAAElFTkSuQmCC",
+    ),
+}
 
 
-def canvas(size):
-    im = Image.new("P", size, 0)
-    pal = [v for rgb in SHADES for v in rgb] + [0] * (768 - 12)
-    im.putpalette(pal)
-    return im
+def verify_png(data: bytes, expected_size: tuple[int, int]) -> None:
+    if data[:8] != b"\x89PNG\r\n\x1a\n":
+        raise ValueError("invalid PNG signature")
+    pos = 8
+    size = None
+    while pos < len(data):
+        length = struct.unpack(">I", data[pos:pos + 4])[0]
+        kind = data[pos + 4:pos + 8]
+        payload = data[pos + 8:pos + 8 + length]
+        crc = struct.unpack(">I", data[pos + 8 + length:pos + 12 + length])[0]
+        actual = zlib.crc32(payload, zlib.crc32(kind)) & 0xffffffff
+        if crc != actual:
+            raise ValueError(f"CRC mismatch in {kind!r}")
+        if kind == b"IHDR":
+            size = struct.unpack(">II", payload[:8])
+            if payload[9] not in (4, 6):
+                raise ValueError("sprite PNG does not contain an alpha channel")
+        pos += 12 + length
+        if kind == b"IEND":
+            break
+    if size != expected_size:
+        raise ValueError(f"expected {expected_size}, got {size}")
 
-
-def front():
-    im = canvas((40,40)); d = ImageDraw.Draw(im)
-    d.line([(28,29),(33,27),(36,23),(36,18),(33,14),(30,13)], fill=3, width=5)
-    d.line([(29,28),(32,26),(34,22),(34,18),(32,16),(30,15)], fill=1, width=2)
-    d.ellipse((13,19,31,32), fill=3)
-    d.ellipse((15,20,29,30), fill=1)
-    d.polygon([(14,27),(20,27),(19,37),(14,37)], fill=3)
-    d.polygon([(24,27),(29,27),(31,36),(26,36)], fill=3)
-    d.polygon([(16,28),(18,28),(17,34),(15,34)], fill=1)
-    d.polygon([(26,28),(28,28),(29,33),(27,33)], fill=1)
-    d.line([(14,36),(19,36)], fill=2, width=1)
-    d.line([(26,35),(31,35)], fill=2, width=1)
-    d.polygon([(7,12),(7,8),(10,8),(9,3),(14,8),(18,7),(23,3),(22,10),(25,13),(24,20),(20,24),(12,24),(7,20)], fill=3)
-    d.polygon([(9,12),(10,9),(12,9),(11,6),(14,10),(18,9),(21,6),(20,11),(22,13),(22,19),(19,22),(13,22),(9,19)], fill=1)
-    d.polygon([(10,8),(10,5),(13,9)], fill=2)
-    d.polygon([(20,9),(22,5),(21,10)], fill=2)
-    d.polygon([(13,10),(14,5),(16,10)], fill=3)
-    d.polygon([(17,10),(19,5),(20,11)], fill=3)
-    d.line([(14,8),(15,6)], fill=1, width=1)
-    d.line([(18,8),(19,6)], fill=1, width=1)
-    d.rectangle((11,13,13,15), fill=3); d.point((11,13), fill=0)
-    d.rectangle((18,13,20,15), fill=3); d.point((18,13), fill=0)
-    d.polygon([(15,11),(16,10),(18,11),(17,12),(16,12)], fill=2)
-    d.point((16,18), fill=3)
-    d.line([(13,19),(16,21),(19,19)], fill=2, width=1)
-    d.line([(13,23),(16,25),(19,24)], fill=2, width=2)
-    return im
-
-
-def back():
-    im = canvas((32,32)); d = ImageDraw.Draw(im)
-    d.line([(22,25),(27,22),(29,18),(28,13),(25,10),(23,10)], fill=3, width=4)
-    d.line([(23,24),(26,21),(27,18),(26,14),(24,12)], fill=1, width=2)
-    d.ellipse((8,14,24,27), fill=3)
-    d.ellipse((10,15,22,25), fill=1)
-    d.polygon([(9,23),(14,23),(13,31),(9,31)], fill=3)
-    d.polygon([(18,23),(23,23),(24,31),(20,31)], fill=3)
-    d.polygon([(11,24),(13,24),(12,29),(10,29)], fill=1)
-    d.polygon([(20,24),(22,24),(23,29),(21,29)], fill=1)
-    d.polygon([(7,10),(8,7),(10,7),(9,2),(13,6),(18,6),(22,2),(21,8),(24,11),(23,17),(20,20),(11,20),(7,17)], fill=3)
-    d.polygon([(9,10),(10,8),(12,8),(11,5),(14,8),(18,8),(20,5),(19,9),(21,11),(21,16),(19,18),(12,18),(9,16)], fill=1)
-    d.polygon([(13,8),(14,4),(16,8)], fill=3)
-    d.polygon([(16,8),(18,4),(19,9)], fill=3)
-    d.line([(11,18),(19,18),(21,20)], fill=2, width=2)
-    return im
-
-
-def icon():
-    im = canvas((16,32)); d = ImageDraw.Draw(im)
-    for frame, lift in enumerate((0,1)):
-        y = frame * 16 - lift
-        d.polygon([(3,7+y),(3,5+y),(5,5+y),(4,2+y),(7,5+y),(9,5+y),(12,2+y),(11,6+y),(13,8+y),(12,13+y),(9,15+y),(6,15+y),(3,12+y)], fill=3)
-        d.polygon([(5,7+y),(5,6+y),(6,6+y),(6,4+y),(7,6+y),(9,6+y),(10,4+y),(10,7+y),(11,8+y),(10,12+y),(8,13+y),(6,13+y),(5,11+y)], fill=1)
-        d.point((6,9+y), fill=3); d.point((9,9+y), fill=3)
-        d.point((8,11+y), fill=2)
-    return im
-
-
-def save(im, path):
-    ROOT.mkdir(parents=True, exist_ok=True)
-    # Convert the four palette indices to actual grayscale luminance bytes.
-    # Avoiding a PLTE chunk makes the files simpler and more robust in-game.
-    pixels = bytes(SHADES[index][0] for index in im.tobytes())
-    gray = Image.frombytes("L", im.size, pixels)
-    out = ROOT / path
-    gray.save(out, format="PNG", optimize=True)
-    with Image.open(out) as check:
-        check.verify()
 
 if __name__ == "__main__":
-    save(front(), "aeglet_front.png")
-    save(back(), "aeglet_back.png")
-    save(icon(), "aeglet_icon.png")
-    print("generated and verified Aeglet assets")
+    ROOT.mkdir(parents=True, exist_ok=True)
+    for name, (size, encoded) in ASSETS.items():
+        data = b64decode(encoded)
+        verify_png(data, size)
+        (ROOT / name).write_bytes(data)
+        print(f"restored {name}")
