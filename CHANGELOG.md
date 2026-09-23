@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.1.5
+
+- Replace the prototype Aeglet artwork with a substantially more polished Gen 2-inspired sprite set.
+- Increase the front battle sprite from 40x40 to 56x56 and set `frontSize = 7`.
+- Add real alpha transparency to the front sprite, back sprite, and party icon so no white sprite box is rendered in battle.
+- Rework the back sprite and icon to match the new tan, brown, cream, and purple visual identity.
+- Require alpha-capable PNGs in the release asset validator in addition to CRC and dimension checks.
+- Update the asset restoration script so it reproduces the exact release-tested transparent PNG bytes.
+
 ## 0.1.4
 
 - Replace Aeglet's front, back, and party icon with validated grayscale PNGs that contain no palette chunk.
