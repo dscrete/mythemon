@@ -39,7 +39,7 @@ jobs:
           import zlib
 
           expected = {
-              "aeglet_front.png": (40, 40),
+              "aeglet_front.png": (56, 56),
               "aeglet_back.png": (32, 32),
               "aeglet_icon.png": (16, 32),
           }
