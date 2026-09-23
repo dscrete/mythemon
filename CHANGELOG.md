@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.3
+
+- Replace corrupted Aeglet front, back, and party icon PNGs with freshly generated valid image files.
+- Add release-time PNG signature, dimension, chunk-boundary, and CRC validation so malformed assets cannot be packaged again.
+
 ## 0.1.2
 
 - Fix MYTH CHARM not appearing on continued saves.
