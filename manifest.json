@@ -1,13 +1,13 @@
 {
   "id": "mythmon",
   "name": "Mythmon",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "entry": "main.lua",
   "api": 2,
   "profile": "content",
   "category": "GAMEPLAY",
   "games": ["gen1"],
-  "description": "Original myth-themed Pokemon for Gen1Recomp. Adds the unevolved Aeglet with transparent Gen 2-inspired static art and a Myth Charm encounter-testing utility.",
+  "description": "Original myth-themed Pokemon for Gen1Recomp. Adds the unevolved Aeglet with native-size Gen 2-inspired static art and a Myth Charm encounter-testing utility.",
   "github": "dscrete/mythemon",
   "experimental": true
 }
