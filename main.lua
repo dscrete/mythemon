@@ -22,8 +22,6 @@ return function(mod)
   local back = mod.path .. "/assets/aeglet_back.png"
   local icon = mod.path .. "/assets/aeglet_icon.png"
 
-  -- A short, soft two-note cry. It is authored here rather than borrowing a
-  -- vanilla species cry so Aeglet remains self-contained.
   mod.content.cries:register(SPECIES, {
     chip = ChipAsm.sfx{
       channels = {
@@ -48,8 +46,6 @@ return function(mod)
   mod.content.pokemon:register(SPECIES, {
     id = SPECIES,
     name = "AEGLET",
-    -- Kept after the complete Gen 2 dex so future Johto compatibility does
-    -- not force this proof-of-concept species to change identity.
     dex = 252,
     types = { "PSYCHIC" },
     baseStats = {
@@ -85,10 +81,6 @@ return function(mod)
     },
   })
 
-  -- A permanent testing utility for Mythmon development. Using it outside
-  -- battle arms the next real wild encounter; the species hook consumes the
-  -- flag only after an encounter has actually rolled, so empty grass steps do
-  -- not waste it. The item itself is never consumed.
   mod.content.item_effects:register(CHARM_EFFECT, {
     field = true,
     battle = false,
@@ -123,24 +115,28 @@ return function(mod)
     return rolled
   end)
 
-  -- Existing saves receive the testing charm automatically. If the Gen 1 bag
-  -- is full, leave the save untouched and log a useful warning instead.
-  mod.events:on("game.ready", function(ev)
-    local game = ev and ev.game
-    local save = game and game.save
+  local function grantCharm(save)
     if not save then return end
     save.inventory = save.inventory or {}
     if save.inventory[CHARM] then return end
-    if Bag.add(save, CHARM, 1, game.data) then
+    if Bag.add(save, CHARM, 1) then
       mod.log:info("MYTH CHARM added to the bag")
     else
       mod.log:warn("MYTH CHARM could not be added because the bag is full")
     end
+  end
+
+  -- game.ready fires before the player chooses CONTINUE, so granting there
+  -- only modifies the temporary boot save. These events run on the save the
+  -- player will actually use.
+  mod.events:on("save.created", function(ev)
+    grantCharm(ev and ev.save)
   end)
 
-  -- Normal placement remains deliberately rare. Replace only the rarest
-  -- Viridian Forest slot while preserving whatever encounter table exists
-  -- ahead of this mod.
+  mod.events:on("save.loaded", function(ev)
+    grantCharm(ev and ev.save)
+  end)
+
   local forest = mod.content.encounters:get("VIRIDIAN_FOREST")
   if forest and forest.grass and type(forest.grass.slots) == "table"
       and #forest.grass.slots >= 10 then
