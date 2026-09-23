@@ -1,4 +1,7 @@
 local SPECIES = "MYTHMON_AEGLET"
+local CHARM = "MYTHMON_MYTH_CHARM"
+local CHARM_EFFECT = "MYTHMON_FORCE_ENCOUNTER"
+local FORCE_KEY = "forceAegletEncounter"
 
 local function cloneSlots(slots)
   local out = {}
@@ -13,6 +16,7 @@ end
 
 return function(mod)
   local ChipAsm = require("src.audio.ChipAsm")
+  local Bag = require("src.inventory.Bag")
 
   local front = mod.path .. "/assets/aeglet_front.png"
   local back = mod.path .. "/assets/aeglet_back.png"
@@ -81,9 +85,62 @@ return function(mod)
     },
   })
 
-  -- First-pass test placement: replace only the rarest Viridian Forest slot
-  -- while preserving whatever encounter table exists ahead of this mod.
-  -- This makes Aeglet obtainable without owning the whole encounter table.
+  -- A permanent testing utility for Mythmon development. Using it outside
+  -- battle arms the next real wild encounter; the species hook consumes the
+  -- flag only after an encounter has actually rolled, so empty grass steps do
+  -- not waste it. The item itself is never consumed.
+  mod.content.item_effects:register(CHARM_EFFECT, {
+    field = true,
+    battle = false,
+    needsTarget = false,
+    use = function()
+      if mod.save:get(FORCE_KEY, false) then
+        return "kept", { "The MYTH CHARM is\nalready resonating." }
+      end
+      mod.save:set(FORCE_KEY, true)
+      return "kept", { "The MYTH CHARM\nbegins to hum...\fA strange presence\ndraws near." }
+    end,
+  })
+
+  mod.content.items:register(CHARM, {
+    id = CHARM,
+    name = "MYTH CHARM",
+    price = 0,
+    keyItem = true,
+    tossable = false,
+    needsTarget = false,
+    effect = CHARM_EFFECT,
+  })
+
+  mod.hooks:wrap("encounter.species", function(next, enc, ctx)
+    local rolled = next(enc, ctx)
+    if rolled and mod.save:get(FORCE_KEY, false) then
+      mod.save:set(FORCE_KEY, false)
+      rolled.species = SPECIES
+      rolled.level = 5
+      mod.log:info("MYTH CHARM forced the next wild encounter to Aeglet")
+    end
+    return rolled
+  end)
+
+  -- Existing saves receive the testing charm automatically. If the Gen 1 bag
+  -- is full, leave the save untouched and log a useful warning instead.
+  mod.events:on("game.ready", function(ev)
+    local game = ev and ev.game
+    local save = game and game.save
+    if not save then return end
+    save.inventory = save.inventory or {}
+    if save.inventory[CHARM] then return end
+    if Bag.add(save, CHARM, 1, game.data) then
+      mod.log:info("MYTH CHARM added to the bag")
+    else
+      mod.log:warn("MYTH CHARM could not be added because the bag is full")
+    end
+  end)
+
+  -- Normal placement remains deliberately rare. Replace only the rarest
+  -- Viridian Forest slot while preserving whatever encounter table exists
+  -- ahead of this mod.
   local forest = mod.content.encounters:get("VIRIDIAN_FOREST")
   if forest and forest.grass and type(forest.grass.slots) == "table"
       and #forest.grass.slots >= 10 then
