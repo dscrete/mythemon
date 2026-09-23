@@ -3,6 +3,9 @@
 
 Dimensions follow Gen1Recomp's compact custom-species example:
 40x40 front (frontSize 5), 32x32 back, and a 16x32 two-frame icon.
+
+Assets are written as plain grayscale PNGs rather than indexed-palette PNGs.
+This keeps the files simple for LÖVE and makes CRC validation straightforward.
 """
 from pathlib import Path
 from PIL import Image, ImageDraw
@@ -78,10 +81,17 @@ def icon():
 
 def save(im, path):
     ROOT.mkdir(parents=True, exist_ok=True)
-    im.save(ROOT / path)
+    # Convert the four palette indices to actual grayscale luminance bytes.
+    # Avoiding a PLTE chunk makes the files simpler and more robust in-game.
+    pixels = bytes(SHADES[index][0] for index in im.tobytes())
+    gray = Image.frombytes("L", im.size, pixels)
+    out = ROOT / path
+    gray.save(out, format="PNG", optimize=True)
+    with Image.open(out) as check:
+        check.verify()
 
 if __name__ == "__main__":
     save(front(), "aeglet_front.png")
     save(back(), "aeglet_back.png")
     save(icon(), "aeglet_icon.png")
-    print("generated Aeglet assets")
+    print("generated and verified Aeglet assets")
