@@ -41,6 +41,7 @@ return function(mod)
   mod.content.icons:register(SPECIES, {
     image = icon,
     frames = 2,
+    trueColor = true,
   })
 
   mod.content.pokemon:register(SPECIES, {
@@ -69,8 +70,9 @@ return function(mod)
     spriteFront = front,
     spriteBack = back,
     frontSize = 7,
+    trueColor = true,
     cry = SPECIES,
-    icon = { image = icon, frames = 2 },
+    icon = { image = icon, frames = 2, trueColor = true },
     dexEntry = {
       kind = "FABLE",
       heightFt = 1,
