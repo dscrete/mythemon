@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.8
+
+- Mark Aeglet's battle sprites as `trueColor` so Gen1Recomp does not quantize/recolor the tan, brown, cream, and purple artwork through the legacy four-shade battle palette pipeline.
+- Mark Aeglet's registered party icon and embedded species icon as `trueColor` for consistent menu rendering.
+- Keep the v0.1.7 sprite artwork unchanged so this release isolates the rendering fix from any art changes.
+
 ## 0.1.7
 
 - Redraw Aeglet's battle art toward the intended Gen 2 visual target after the 0.1.6 native-size pass proved too visually primitive.
