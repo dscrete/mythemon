@@ -68,7 +68,7 @@ return function(mod)
     evolutions = {},
     spriteFront = front,
     spriteBack = back,
-    frontSize = 5,
+    frontSize = 7,
     cry = SPECIES,
     icon = { image = icon, frames = 2 },
     dexEntry = {
@@ -126,9 +126,6 @@ return function(mod)
     end
   end
 
-  -- game.ready fires before the player chooses CONTINUE, so granting there
-  -- only modifies the temporary boot save. These events run on the save the
-  -- player will actually use.
   mod.events:on("save.created", function(ev)
     grantCharm(ev and ev.save)
   end)
