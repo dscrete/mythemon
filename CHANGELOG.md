@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.4
+
+- Replace Aeglet's front, back, and party icon with validated grayscale PNGs that contain no palette chunk.
+- Update the asset generator to emit and verify the same grayscale PNG format.
+- Keep release-time PNG CRC and dimension validation enabled before packaging.
+
 ## 0.1.3
 
 - Replace corrupted Aeglet front, back, and party icon PNGs with freshly generated valid image files.
