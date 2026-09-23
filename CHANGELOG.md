@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.9
+
+- Declare explicit Gen1Recomp engine compatibility through version 0.5.0 using the manifest `game_version` range.
+- Keep Mod API 2 and the existing Aeglet/Myth Charm implementation unchanged because the registries, `save.loaded` lifecycle event, `encounter.species` hook, item-effects registry, and true-color sprite support Mythmon uses remain available in the current engine API.
+- Do not claim compatibility beyond 0.5.0 yet; later engine releases can be tested and widened deliberately.
+
 ## 0.1.8
 
 - Mark Aeglet's battle sprites as `trueColor` so Gen1Recomp does not quantize/recolor the tan, brown, cream, and purple artwork through the legacy four-shade battle palette pipeline.
