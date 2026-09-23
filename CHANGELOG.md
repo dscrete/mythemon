@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.1.10
+
+- Fix Mythmon failing current Gen1Recomp registry validation after the true-color update.
+- Remove `trueColor` from the nested `pokemon.icon` record, whose current strict schema accepts only `image` and optional `frames`.
+- Keep `trueColor = true` on Aeglet's top-level Pokemon record and on the separate `icons` registry entry, where the current Gen1Recomp schema explicitly supports it.
+- This allows Mythmon to load again so Gen1Recomp can reclaim Aeglet and Mythmon items that were quarantined as unknown content while v0.1.8/v0.1.9 failed validation.
+
 ## 0.1.9
 
 - Declare explicit Gen1Recomp engine compatibility through version 0.5.0 using the manifest `game_version` range.
@@ -49,7 +56,7 @@
 ## 0.1.3
 
 - Replace corrupted Aeglet front, back, and party icon PNGs with freshly generated valid image files.
-- Add release-time PNG signature, dimension, chunk-boundary, and CRC validation so malformed assets cannot be packaged again.
+- Add release-time PNG signature, dimensions, alpha-format, chunk and CRC validation so malformed assets cannot be packaged again.
 
 ## 0.1.2
 
