@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.1.1
+
+- Add the MYTH CHARM permanent testing key item.
+- Using MYTH CHARM outside battle arms the next successful wild encounter to become a level 5 Aeglet.
+- The force flag is stored in Mythmon's per-save state and clears immediately after the forced encounter is selected.
+- Existing saves automatically receive the charm when possible.
+- Keep Aeglet's normal rare Viridian Forest encounter unchanged.
+
 ## 0.1.0
 
 - Add Aeglet (`MYTHMON_AEGLET`) as Mythmon's first original species.
