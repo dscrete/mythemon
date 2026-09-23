@@ -14,7 +14,7 @@ The first species is **Aeglet**, a small unevolved Psychic-type creature designe
 - No evolution yet
 - Normal encounter: rare slot in Viridian Forest at level 5
 
-Aeglet's current art keeps the established fox-like mythic design while aiming for a middle ground between the overly detailed concept pass and the overly primitive 0.1.6 reduction. The front and back sprites use controlled pixel clusters, a restrained tan/brown/cream/purple palette, and full alpha transparency.
+Aeglet's current art keeps the established fox-like mythic design while aiming for a middle ground between the overly detailed concept pass and the overly primitive 0.1.6 reduction. The front and back sprites use controlled pixel clusters, a restrained tan/brown/cream/purple palette, and full alpha transparency. Aeglet's battle art and party icon are registered as true-color assets so Gen1Recomp preserves the authored colors instead of remapping them through the legacy four-shade battle palette pipeline.
 
 `tools/make_assets.py` restores the exact release-tested sprite bytes deterministically.
 
