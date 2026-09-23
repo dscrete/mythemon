@@ -68,7 +68,7 @@ return function(mod)
     evolutions = {},
     spriteFront = front,
     spriteBack = back,
-    frontSize = 5,
+    frontSize = 7,
     cry = SPECIES,
     icon = { image = icon, frames = 2 },
     dexEntry = {
