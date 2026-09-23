@@ -34,4 +34,8 @@ Extract the release ZIP so the top-level `mythmon` directory is inside Gen1Recom
 
 ## Compatibility scope
 
+Mythmon uses Mod API 2 and currently declares Gen1Recomp compatibility from **0.3.3 through 0.5.0 inclusive**. Development builds are also allowed for local testing. Versions newer than 0.5.0 are intentionally not claimed yet; the range can be widened after they are checked.
+
+The current engine API still provides the custom Pokemon/icon registries, item-effects registry, `save.loaded`/`save.created` lifecycle events, `encounter.species` hook, and true-color sprite support used by Mythmon, so no gameplay-code migration was required for the 0.5.0 compatibility update.
+
 This release tests the core custom-species pipeline only. It does not yet add bespoke animated battle frames, shiny art, or Wilds of Kanto overworld/follower sprites. The species and asset IDs are namespaced to make those compatibility layers easier to add later.
