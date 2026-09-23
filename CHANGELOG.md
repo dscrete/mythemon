@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.2
+
+- Fix MYTH CHARM not appearing on continued saves.
+- Grant the charm from `save.loaded` and `save.created`, after the real player save exists, instead of the pre-title `game.ready` boot save.
+
 ## 0.1.1
 
 - Add the MYTH CHARM permanent testing key item.
