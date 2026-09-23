@@ -6,7 +6,7 @@ Mythmon adds original, myth-themed Pokemon to Gen1Recomp.
 
 The first species is **Aeglet**, a small unevolved Psychic-type creature designed to leave room for a later evolution.
 
-- Static transparent battle front sprite: 56x56, using a restrained Gen 2-inspired palette
+- Static transparent battle front sprite: 40x40, cleaned at native in-game size
 - Static transparent battle back sprite: 32x32
 - Transparent two-frame party icon: 16x32
 - Original chip cry
@@ -14,9 +14,9 @@ The first species is **Aeglet**, a small unevolved Psychic-type creature designe
 - No evolution yet
 - Normal encounter: rare slot in Viridian Forest at level 5
 
-Aeglet's front sprite is based on a higher-resolution concept pass, then deliberately reduced and cleaned into a low-resolution battle asset. The white sprite box used by the initial prototype has been removed; all current sprite assets contain alpha transparency.
+Aeglet's current art keeps the established fox-like mythic design, but the battle assets are reduced and cleaned at their final game dimensions rather than being displayed as a larger concept sprite. The front and back sprites use simplified pixel clusters, a restrained tan/brown/cream/purple palette, and alpha transparency.
 
-`tools/make_assets.py` restores the exact release-tested sprite bytes and verifies their dimensions, alpha-capable PNG format, and CRCs.
+`tools/make_assets.py` regenerates the native-size release sprite pixels deterministically.
 
 ## MYTH CHARM testing utility
 
