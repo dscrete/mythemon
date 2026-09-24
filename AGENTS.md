@@ -2,35 +2,93 @@
 
 Mythmon is a Gen1Recomp mod adding original myth-themed Pokemon.
 
-## Battle sprite workflow
+## Agent cost discipline
 
-For Fakemon battle-sprite work, the primary agent acts as the art director.
+Use the primary agent for project direction, architecture, ambiguous decisions,
+major concept changes, integration decisions, final review, and user-facing
+synthesis.
 
-The primary agent should:
-- understand the user's concept and reference images;
-- establish the creature's visual identity and important locked features;
-- formulate detailed PixelLab art direction when needed;
-- judge subjective design problems;
-- maintain consistency between front and back sprites.
+Delegate bounded, tool-heavy, repetitive, or easily verifiable work to
+specialist subagents whenever possible. The purpose of the specialist agents is
+to preserve primary-model usage for decisions that actually need it.
 
-Routine PixelLab rendering should be delegated to the `pixellab_renderer` subagent.
+The primary agent should normally avoid personally performing long sequences of:
+- PixelLab generation calls;
+- sprite variations and concrete visual revisions;
+- repetitive derivative-frame production;
+- routine asset conversion, renaming, copying, or validation;
+- straightforward implementation once the design and API shape are settled.
 
-Once art direction is established, do not repeatedly use the primary agent for mechanical PixelLab calls or simple revisions.
+A specialist may make local decisions needed to complete a bounded task. Do not
+escalate merely because a task involves some visual judgment.
 
-Concrete user feedback such as "shorter ears", "smaller eyes", "use version B", or "keep everything else unchanged" should normally remain with `pixellab_renderer`.
+Escalate when requirements materially change or conflict, a decision affects the
+project architecture, the species concept itself is changing, or repeated
+attempts cannot preserve consistency.
 
-Return to the primary agent for subjective feedback, substantial redesign, or unresolved consistency problems.
+## Fakemon art workflow
+
+The primary agent owns the species concept, project-level direction, technical
+constraints, and final approval. Routine PixelLab work should be delegated to
+`pixellab_renderer`.
+
+The PixelLab workflow has two modes.
+
+### Exploration mode
+
+Before a species design is locked, `pixellab_renderer` may do bounded creative
+exploration inside the supplied species brief. This includes:
+- generating a small set of coherent design candidates;
+- adjusting proportions, pose, silhouette, palette, markings, and detail level;
+- making ordinary pixel-art decisions without repeatedly returning to the
+  primary agent;
+- iterating directly on concrete user feedback;
+- comparing candidates against the stated visual and technical constraints.
+
+The primary agent should return mainly at useful checkpoints: establishing the
+brief, resolving genuinely ambiguous direction, reviewing a batch, or approving
+a master design.
+
+### Production mode
+
+Once a master design is approved, treat its art specification and approved
+reference assets as authoritative. `pixellab_renderer` should then preserve the
+design strictly while producing derivatives such as:
+- front and back battle sprites;
+- battle animation frames;
+- directional overworld sprites and walk cycles;
+- party/menu icons;
+- shiny derivatives when requested;
+- concrete revisions to any of the above.
+
+Do not creatively redesign a locked species during production work unless the
+user explicitly reopens the design.
+
+## Persistent art specifications
+
+Keep a compact art specification for each species under `art/<species>/`.
+Record the concept, locked features, approved references, palette/markings,
+production status, and useful PixelLab settings or reference identifiers there.
+Use this file to reduce repeated context reconstruction between agents.
 
 ## Asset handling
 
-Production battle assets currently live in `assets/`.
+Production runtime assets currently live in `assets/`. Do not use production
+asset paths as scratch space, and do not overwrite an approved production sprite
+until the user explicitly approves the replacement.
 
-Do not use production asset paths as scratch space.
-
-Do not overwrite an existing production sprite until the user explicitly approves the replacement.
-
-The current battle asset conventions are:
+The currently shipped Aeglet battle assets are:
 - front sprite: transparent 56x56 PNG;
-- back sprite: transparent 32x32 PNG.
+- back sprite: transparent 32x32 PNG;
+- party icon: transparent 16x32 PNG with two frames.
 
-`tools/make_assets.py` restores the release-tested Aeglet assets and overwrites the existing Aeglet PNGs. Do not run it during sprite generation or revision unless explicitly requested.
+These are the current shipped formats, not permanent requirements for every
+future animation or compatibility layer. Inspect the current Gen1Recomp API and
+relevant compatibility mod before establishing a new sprite-sheet format.
+
+`tools/make_assets.py` currently restores the release-tested Aeglet assets and
+overwrites the existing Aeglet PNGs. Do not run it during sprite generation or
+revision unless explicitly requested. New approved artwork should be treated as
+source material first; update deterministic/restoration tooling deliberately
+after the art is approved rather than allowing old generated bytes to overwrite
+new work.
